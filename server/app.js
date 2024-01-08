@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+const errorMiddleware = require("./middleware/error");
+
 // import routes
 const product = require("./routes/productRoute");
 
@@ -12,5 +14,8 @@ app.get("/", (req, res) =>
 );
 
 app.use("/api/v1", product);
+
+// Error handling middleware
+app.use(errorMiddleware);
 
 module.exports = app;
