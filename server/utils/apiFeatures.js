@@ -18,6 +18,18 @@ class ApiFeatures {
 
     return this;
   }
+
+  filter() {
+    const queryCopy = { ...this.queryStr };
+
+    // Removing some field for Category
+    const removeFeild = ["keyword", "page", "limit"];
+    removeFeild.forEach((key) => delete queryCopy[key]);
+
+    this.query = this.query.find(queryCopy);
+
+    return this;
+  }
 }
 
 module.exports = ApiFeatures;
