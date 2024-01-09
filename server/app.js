@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.get("/", (req, res) =>
   res.send(`server is working fine
-<a href="/product">product</a>`)
+<a href="/api/v1/product">product</a>`)
 );
 
 app.use("/api/v1", product);
