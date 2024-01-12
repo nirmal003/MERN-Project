@@ -5,6 +5,7 @@ const errorMiddleware = require("./middleware/error");
 
 // import routes
 const product = require("./routes/productRoute");
+const user = require("./routes/userRoute");
 
 app.use(express.json());
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) =>
 );
 
 app.use("/api/v1", product);
+app.use("/api/v1", user);
 
 // Error handling middleware
 app.use(errorMiddleware);
