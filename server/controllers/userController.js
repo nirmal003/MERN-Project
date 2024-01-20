@@ -126,7 +126,7 @@ exports.resetPassword = createAsyncError(async (req, res, next) => {
 });
 
 // Get User Details
-exports.getUserDetails = createAsyncError(async (req, res, next) => {
+exports.getUserDetail = createAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   res.status(200).json({ success: true, user });
