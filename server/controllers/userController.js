@@ -210,3 +210,23 @@ exports.updateUserRole = createAsyncError(async (req, res, next) => {
 
   res.status(200).json({ success: true });
 });
+
+// Update User Role -- Admin
+exports.deleteUser = createAsyncError(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  //  We will remove Couldinary later
+
+  if (!user) {
+    return next(
+      new ErrorHandler(`User does not exist with Id: ${req.params.id}`)
+    );
+  }
+
+  await user.deleteOne({ _id: user.id });
+
+  res.status(200).json({
+    success: true,
+    message: "User Deleted Successfully",
+  });
+});
