@@ -152,3 +152,20 @@ exports.updatePassword = createAsyncError(async (req, res, next) => {
 
   sentToken(user, 200, res);
 });
+
+// Update User Profile
+exports.updateUserProfile = createAsyncError(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  //  We will add Couldinary later
+  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({ success: true, user });
+});
