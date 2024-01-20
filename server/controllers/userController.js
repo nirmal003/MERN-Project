@@ -78,7 +78,7 @@ exports.forgotPassword = createAsyncError(async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `Email sent to ${user.email} successfully `,
-      resetToken,
+      // resetToken,
     });
   } catch (error) {
     user.resetPasswordToken = undefined;
@@ -161,11 +161,22 @@ exports.updateUserProfile = createAsyncError(async (req, res, next) => {
   };
 
   //  We will add Couldinary later
+
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
 
-  res.status(200).json({ success: true, user });
+  res.status(200).json({
+    success: true,
+    // user
+  });
+});
+
+//  Get All User -- Admin
+exports.getAllUser = createAsyncError(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({ success: true, users });
 });

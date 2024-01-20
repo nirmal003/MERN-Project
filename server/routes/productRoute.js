@@ -19,7 +19,8 @@ router.route("/product").get(getALlProducts);
 router
   .route("/product/:id")
   .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct)
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct)
-  .get(isAuthenticatedUser, getProductDetail);
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
+
+router.route("/product/:id").get(getProductDetail);
 
 module.exports = router;
