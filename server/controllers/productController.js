@@ -75,3 +75,42 @@ exports.deleteProduct = createAsyncError(async (req, res, next) => {
     });
   }
 });
+
+//  Create New Review or Update Review
+exports.createProductReview = createAsyncError(async (req, res, next) => {
+  const { rating, comment, productId } = req.body;
+
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+
+  const product = await Product.findById(productId);
+
+  const isReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
+
+  if (isReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString()) {
+        (rev.rating = Number(rating)), (rev.comment = comment);
+      }
+    });
+  } else {
+    product.reviews.push(review);
+    product.numOfReviews = product.reviews.length;
+  }
+
+  const ratings = product.reviews.reduce((acc, rev) => {
+    return acc + rev.rating;
+  }, 0);
+
+  product.ratings = ratings / product.reviews.length;
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({ success: true });
+});
