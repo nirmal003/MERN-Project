@@ -31,7 +31,9 @@ exports.loginUser = createAsyncError(async (req, res, next) => {
 
   const user = await User.findOne({ email }).select("+password");
 
-  if (!user) next(new ErrorHandler("Invalid Email or Password", 401));
+  if (!user) {
+    return next(new ErrorHandler("Invalid Email or Password", 401));
+  }
 
   const isPasswordMatched = await user.comparePassword(password);
 

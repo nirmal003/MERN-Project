@@ -104,11 +104,11 @@ exports.createProductReview = createAsyncError(async (req, res, next) => {
     product.numOfReviews = product.reviews.length;
   }
 
-  const ratings = product.reviews.reduce((acc, rev) => {
+  const totalOfRatings = product.reviews.reduce((acc, rev) => {
     return acc + rev.rating;
   }, 0);
 
-  product.ratings = ratings / product.reviews.length;
+  product.ratings = totalOfRatings / product.reviews.length;
 
   await product.save({ validateBeforeSave: false });
 
@@ -124,4 +124,42 @@ exports.getProductReviews = createAsyncError(async (req, res, next) => {
   }
 
   res.status(200).json({ success: true, reviews: product.reviews });
+});
+
+//  Delete Review
+exports.deleteReview = createAsyncError(async (req, res, next) => {
+  const product = await Product.findById(req.query.productId);
+
+  if (!product) {
+    return next(new ErrorHandler("Product Not Found", 404));
+  }
+
+  const reviews = product.reviews.filter((rev) => {
+    if (
+      rev._id.toString() === req.query.id.toString() &&
+      req.user.id === rev.user.toString()
+    ) {
+      return rev._id.toString() !== req.query.id.toString();
+    } else {
+      return product.reviews;
+    }
+  });
+
+  const totalOfRatings = reviews.reduce((acc, rev) => {
+    return acc + rev.rating;
+  }, 0);
+
+  const ratings = totalOfRatings / reviews.length;
+
+  const numOfReviews = reviews.length;
+
+  console.log(totalOfRatings, numOfReviews, ratings, reviews.length);
+
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    { reviews, ratings: `${isNaN(ratings) ? 0 : ratings}`, numOfReviews },
+    { new: true, runValidators: true, useFindAndModify: false }
+  );
+
+  res.status(200).json({ success: true });
 });
