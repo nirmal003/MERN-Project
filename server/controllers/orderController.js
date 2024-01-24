@@ -50,3 +50,14 @@ exports.myOrders = createAsyncError(async (req, res, next) => {
 
   res.status(200).json({ success: true, orders });
 });
+
+//  Get All Orders -- Admin
+exports.getAllOrders = createAsyncError(async (req, res, next) => {
+  const orders = await Order.find();
+
+  const totalAmount = orders.reduce((acc, order) => {
+    acc + order.totalPrice;
+  });
+
+  res.status(200).json({ success: true, totalAmount, orders });
+});
