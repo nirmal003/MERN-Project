@@ -59,7 +59,5 @@ exports.getAllOrders = createAsyncError(async (req, res, next) => {
     return acc + order.totalPrice;
   }, 0);
 
-  console.log(totalAmount);
-
   res.status(200).json({ success: true, totalAmount, orders });
 });
