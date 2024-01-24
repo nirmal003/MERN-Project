@@ -56,8 +56,10 @@ exports.getAllOrders = createAsyncError(async (req, res, next) => {
   const orders = await Order.find();
 
   const totalAmount = orders.reduce((acc, order) => {
-    acc + order.totalPrice;
-  });
+    return acc + order.totalPrice;
+  }, 0);
+
+  console.log(totalAmount);
 
   res.status(200).json({ success: true, totalAmount, orders });
 });
