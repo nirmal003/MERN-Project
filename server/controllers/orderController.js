@@ -74,12 +74,15 @@ exports.updateOrder = createAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("You have already delivered this order", 400));
   }
 
-  order.orderItems.forEach(async (order) => {
-    // if (req.body.status !== "Delivered")
-    await updateStock(order.product, order.quantity);
-  });
+  // update the stock only once -- like processing or shipping
+  if (order.orderStatus === "Processing") {
+    order.orderItems.forEach(async (order) => {
+      await updateStock(order.product, order.quantity);
+    });
+  }
 
-  order.orderStatus = req.body.status;
+  order.orderStatus =
+    req.body.status === "Processing" ? "Processing Stage 1" : req.body.status;
 
   if (req.body.status === "Delivered") order.deliveredAt = Date.now();
 
