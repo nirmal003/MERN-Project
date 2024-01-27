@@ -5,12 +5,15 @@ const sentToken = require("../utils/jwtToken");
 const sentEmail = require("../utils/sentEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
+const { getDataUri } = require("../utils/dataUri");
 
 //  Register User
 exports.registerUser = createAsyncError(async (req, res, next) => {
-  //  Add Cloudinary for Uploading files
+  const file = req.file;
+  const fileUri = getDataUri(file);
 
-  const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+  //  Add Cloudinary for Uploading files
+  const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
     folder: "avatars",
     width: 720,
     crop: "scale",
