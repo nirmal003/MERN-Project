@@ -32,7 +32,9 @@ router.route("/me").get(isAuthenticatedUser, getUserDetail);
 
 router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 
-router.route("/me/update").put(isAuthenticatedUser, updateUserProfile);
+router
+  .route("/me/update")
+  .put(isAuthenticatedUser, singleUpload, updateUserProfile);
 
 router
   .route("/admin/users")

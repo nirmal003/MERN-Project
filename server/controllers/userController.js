@@ -10,15 +10,20 @@ const { getDataUri } = require("../utils/dataUri");
 //  Register User
 exports.registerUser = createAsyncError(async (req, res, next) => {
   const file = req.file;
-  const fileUri = getDataUri(file);
+  const fileUri = file && getDataUri(file);
 
   //  Add Cloudinary for Uploading files
-  const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
-    folder: "avatars",
-    width: 720,
-    crop: "scale",
-    resource_type: "auto",
-  });
+  const myCloud = await cloudinary.v2.uploader.upload(
+    fileUri
+      ? fileUri.content
+      : "https://res.cloudinary.com/dcp4s68w7/image/upload/v1706358875/avatars/kso8ymtenysyzafflcdu.png",
+    {
+      folder: "avatars",
+      width: 720,
+      crop: "scale",
+      resource_type: "auto",
+    }
+  );
 
   const { name, email, password } = req.body;
 
@@ -107,7 +112,7 @@ exports.forgotPassword = createAsyncError(async (req, res, next) => {
 
 //  Reset Password
 exports.resetPassword = createAsyncError(async (req, res, next) => {
-  // creatind Token hash
+  // created Token hash
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -175,7 +180,30 @@ exports.updateUserProfile = createAsyncError(async (req, res, next) => {
     email: req.body.email,
   };
 
-  //  We will add Couldinary later
+  //   Add Couldinary
+  if (req.file !== undefined) {
+    const user = await User.findById(req.user.id);
+
+    const imageId = user.avatar.public_id;
+
+    await cloudinary.v2.uploader.destroy(imageId);
+
+    const file = req.file;
+    const fileUri = getDataUri(file);
+
+    //  Add Cloudinary for Uploading files
+    const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
+      folder: "avatars",
+      width: 720,
+      crop: "scale",
+      resource_type: "auto",
+    });
+
+    newUserData.avatar = {
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
+    };
+  }
 
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
@@ -185,7 +213,7 @@ exports.updateUserProfile = createAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    // user
+    user,
   });
 });
 
