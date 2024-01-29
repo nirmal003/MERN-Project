@@ -14,7 +14,7 @@ const {
   deleteUser,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
-const singleUpload = require("../middleware/multer");
+const { singleUpload } = require("../middleware/multer");
 
 const router = express.Router();
 

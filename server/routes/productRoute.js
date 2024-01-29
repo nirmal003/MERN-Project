@@ -11,12 +11,18 @@ const {
   getALlAdminProducts,
 } = require("../controllers/productController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const { multiUpload } = require("../middleware/multer");
 
 const router = express.Router();
 
 router
   .route("/product/new")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), createProduct);
+  .post(
+    isAuthenticatedUser,
+    authorizeRoles("admin"),
+    multiUpload,
+    createProduct
+  );
 
 router.route("/products").get(getALlProducts);
 

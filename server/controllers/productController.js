@@ -1,10 +1,36 @@
 const createAsyncError = require("../middleware/createAsyncError");
 const Product = require("../models/productModel");
 const ApiFeatures = require("../utils/apiFeatures");
+const cloudinary = require("cloudinary");
+const { getDataUri } = require("../utils/dataUri");
 const ErrorHandler = require("../utils/errorHandler");
 
-// Create Product -- Admin
+// Create New Product -- Admin
 exports.createProduct = createAsyncError(async (req, res, next) => {
+  const files = req.files;
+
+  const fileUri =
+    files.length > 0 &&
+    (await Promise.all(
+      files.map(async (file) => {
+        const dataUri = getDataUri(file);
+
+        //  Add Cloudinary for Uploading files
+        const myCloud = await cloudinary.v2.uploader.upload(dataUri.content, {
+          folder: "avatars",
+          width: 720,
+          crop: "scale",
+          resource_type: "auto",
+        });
+
+        return {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      })
+    ));
+
+  req.body.images = fileUri;
   req.body.user = req.user.id;
 
   const product = await Product.create(req.body);
