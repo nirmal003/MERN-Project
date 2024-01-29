@@ -15,7 +15,7 @@ exports.createProduct = createAsyncError(async (req, res, next) => {
   });
 });
 
-// Get All Product
+// Get All Products
 exports.getALlProducts = createAsyncError(async (req, res, next) => {
   const resultPerPage = 10;
   const productCount = await Product.countDocuments();
@@ -162,4 +162,16 @@ exports.deleteReview = createAsyncError(async (req, res, next) => {
   );
 
   res.status(200).json({ success: true });
+});
+
+// Get All Products -- Admin
+exports.getALlAdminProducts = createAsyncError(async (req, res, next) => {
+  const products = await Product.find();
+  const productCount = await Product.countDocuments();
+
+  res.status(200).json({
+    success: true,
+    products,
+    productCount,
+  });
 });
