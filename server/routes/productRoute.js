@@ -32,7 +32,7 @@ router
 
 router
   .route("/product/:id")
-  .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct)
+  .put(isAuthenticatedUser, authorizeRoles("admin"), multiUpload, updateProduct)
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
 
 router.route("/product/:id").get(getProductDetail);

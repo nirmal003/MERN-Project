@@ -17,7 +17,7 @@ exports.createProduct = createAsyncError(async (req, res, next) => {
 
         //  Add Cloudinary for Uploading files
         const myCloud = await cloudinary.v2.uploader.upload(dataUri.content, {
-          folder: "avatars",
+          folder: "products",
           width: 720,
           crop: "scale",
           resource_type: "auto",
@@ -72,19 +72,51 @@ exports.getProductDetail = createAsyncError(async (req, res, next) => {
 exports.updateProduct = createAsyncError(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
-  if (!product) next(new ErrorHandler("Product not found", 404));
-  else {
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
+  }
+
+  product.images.length > 0 &&
+    product.images.forEach(async (img) => {
+      //  Deleting Files from Cloudinary
+      await cloudinary.v2.uploader.destroy(img.public_id);
     });
 
-    res.status(200).json({
-      success: true,
-      product,
-    });
+  const files = req.files;
+
+  if (files.length > 0) {
+    const fileUri = await Promise.all(
+      files.map(async (file) => {
+        const dataUri = getDataUri(file);
+
+        //  Add Cloudinary for Uploading files
+        const myCloud = await cloudinary.v2.uploader.upload(dataUri.content, {
+          folder: "products",
+          width: 720,
+          crop: "scale",
+          resource_type: "auto",
+        });
+
+        return {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      })
+    );
+
+    req.body.images = fileUri;
   }
+
+  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    product,
+  });
 });
 
 // Delete Product -- Admin
@@ -95,10 +127,11 @@ exports.deleteProduct = createAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Product not found", 404));
   }
 
-  product.images.forEach(async (img) => {
-    //  Deleting Files from Cloudinary
-    await cloudinary.v2.uploader.destroy(img.public_id);
-  });
+  product.images.length > 0 &&
+    product.images.forEach(async (img) => {
+      //  Deleting Files from Cloudinary
+      await cloudinary.v2.uploader.destroy(img.public_id);
+    });
 
   await product.deleteOne({ _id: req.params.id });
 
