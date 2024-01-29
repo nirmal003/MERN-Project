@@ -91,15 +91,21 @@ exports.updateProduct = createAsyncError(async (req, res, next) => {
 exports.deleteProduct = createAsyncError(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
-  if (!product) next(new ErrorHandler("Product not found", 404));
-  else {
-    await product.deleteOne({ _id: req.params.id });
-
-    res.status(200).json({
-      success: true,
-      message: "Product deleted successfully",
-    });
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
   }
+
+  product.images.forEach(async (img) => {
+    //  Deleting Files from Cloudinary
+    await cloudinary.v2.uploader.destroy(img.public_id);
+  });
+
+  await product.deleteOne({ _id: req.params.id });
+
+  res.status(200).json({
+    success: true,
+    message: "Product deleted successfully",
+  });
 });
 
 //  Create New Review or Update Review
