@@ -12,7 +12,7 @@ exports.processPayment = createAsyncError(async (req, res, next) => {
 
   res
     .status(200)
-    .json({ success: true, client_secret: myPAyment.client_secret });
+    .json({ success: true, client_secret: myPayment.client_secret });
 });
 
 exports.sendStripeApiKey = createAsyncError(async (req, res, next) => {
