@@ -2,7 +2,7 @@ const createAsyncError = require("../middleware/createAsyncError");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.processPayment = createAsyncError(async (req, res, next) => {
-  const myPAyment = await stripe.paymentIntents.create({
+  const myPayment = await stripe.paymentIntents.create({
     amount: req.body.amount,
     currency: "inr",
     metadata: {
